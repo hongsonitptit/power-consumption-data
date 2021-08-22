@@ -1,0 +1,248 @@
+<link rel="stylesheet" type="text/css" href="https://code.highcharts.com/css/annotations/popup.css">
+
+<!-- <script src="https://code.highcharts.com/highcharts.js"></script> -->
+<script src="https://code.highcharts.com/modules/boost.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<!-- provide fullscreen option -->
+<!-- <script src="https://code.highcharts.com/stock/modules/exporting.js"></script> -->
+<!-- provide getJSON -->
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- display label in line -->
+<!-- <script src="https://code.highcharts.com/modules/series-label.js"></script> -->
+<!-- <script src="https://code.highcharts.com/stock/indicators/indicators-all.js"></script> -->
+<!-- <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script> -->
+<!-- <script src="https://code.highcharts.com/modules/annotations-advanced.js"></script> -->
+<!-- <script src="https://code.highcharts.com/modules/price-indicator.js"></script> -->
+<!-- <script src="https://code.highcharts.com/modules/stock-tools.js"></script> -->
+<!-- <script src="https://code.highcharts.com/modules/full-screen.js"></script> -->
+
+<p>
+    Chú ý: Số điện hàng tháng tính từ ngày 25 tháng trước tới hết ngày 24 tháng sau
+</p>
+
+<label for="start">Ngày bắt đầu:</label>
+
+<input type="date" id="start_date" name="start_date">
+
+<br>
+
+<label for="start">Ngày kết thúc:</label>
+
+<input type="date" id="end_date" name="end_date">
+
+<button>
+Xem báo cáo
+</button>
+
+<br>
+
+<div id="hour_line_chart"></div>
+
+<br>
+
+<div id="daily_column_chart"></div>
+
+<style>
+    #hour_line_chart {
+        width: 100%;
+        height: 50%;
+        margin: 1em auto;
+    }
+</style>
+
+<script>
+    var seriesOptions = [],
+        seriesCounter = 0,
+        global_symbols = [],
+        selected_groups = ["base_indexes", "balance_funds"];
+
+    var today = new Date();
+    var start_day = 25;
+    var start_month = today.getMonth() == 0 ? 12 : today.getMonth();
+    var start_year = start_month == 12 ? today.getFullYear() - 1 : today.getFullYear();
+    var end_day = today.getDate();
+    var end_month = today.getMonth() + 1;
+    var end_year = today.getFullYear();
+    var start_dd = String(start_day).padStart(2, '0');
+    var start_mm = String(start_month).padStart(2, '0');
+    var end_dd = String(end_day).padStart(2, '0');
+    var end_mm = String(end_month).padStart(2, '0');
+
+    var start_time = start_year + "-" + start_mm + "-" + start_dd;
+    var end_time = end_year + "-" + end_mm + "-" + end_dd;
+
+
+    console.log(start_year);
+    console.log(start_time);
+
+    // set today to start date
+    document.getElementById('start_date').value = start_time;
+    document.getElementById('end_date').value = end_time;
+
+    // create urls
+    var url_prefix = "https://raw.githubusercontent.com/hongsonitptit/power-consumption-data/main/data/";
+    var current_month_url = url_prefix + end_year + end_mm + ".json";
+    var previous_month_url = url_prefix + start_year + start_mm + ".json";
+    var current_year_url = url_prefix + end_year + ".json";
+    var previous_year_url = url_prefix + (end_year - 1) + ".json";
+
+    console.log(current_month_url + " : " + UrlExists(current_month_url));
+    console.log(previous_month_url + " : " + UrlExists(previous_month_url));
+    console.log(current_year_url + " : " + UrlExists(current_year_url));
+    console.log(previous_year_url + " : " + UrlExists(previous_year_url));
+
+    var current_month_data;
+    var previous_month_data;
+    var current_year_data;
+    var previous_year_data;
+    var month_charts = 0;
+    var year_charts = 0;
+    month_charts += UrlExists(current_month_url) ? 1 : 0;
+    month_charts += UrlExists(previous_month_url) ? 1 : 0;
+    year_charts += UrlExists(current_year_url) ? 1 : 0;
+    year_charts += UrlExists(previous_year_url) ? 1 : 0;
+
+
+
+
+
+    Highcharts.getJSON(current_month_url, get_data_in_current_month);
+
+
+
+
+    /**
+     * Create the chart when all data is loaded
+     * @returns {undefined}
+     */
+    function createChart(data) {
+
+        Highcharts.stockChart('hour_line_chart', {
+            chart: {
+                type: 'column',
+                zoomType: 'x',
+                panning: true,
+                panKey: 'shift'
+            },
+
+            legend: {
+                enabled: true
+            },
+
+            navigator: {
+                enabled: true
+            },
+
+            scrollbar: {
+                enabled: true
+            },
+
+            rangeSelector: {
+                enabled: false
+            },
+
+            rangeSelector: {
+                inputPosition: {
+                    align: 'left',
+                    x: 0,
+                    y: 0
+                },
+                buttonPosition: {
+                    align: 'right',
+                    x: 0,
+                    y: 0
+                },
+            },
+
+            xAxis: {
+                labels: {
+                    // format: "{value:%H:%M:%S %d/%m/%Y}"
+                    format: "{value:%H:%M}"
+                },
+                type: "datetime",
+            },
+
+            title: {
+                text: 'Highcharts drawing ' + data.length + ' points'
+            },
+
+            subtitle: {
+                text: 'Using the Boost module'
+            },
+
+            tooltip: {
+                formatter: function() {
+                    return Highcharts.dateFormat('%A, %b %e, %Y', this.x) +
+                        ': <b>' + this.y.toFixed(2) + '</b>';
+                },
+            },
+
+            series: [data]
+        });
+    }
+
+    function success(data) {
+        console.log(global_symbols);
+        let url = this.url;
+        let file_name = url.split('/').pop();
+        let type = url.split('/').pop();
+        let symbol = file_name.split('.')[0];
+        var i = global_symbols.indexOf(symbol);
+        seriesOptions[i] = {
+            name: symbol,
+            data: data
+        };
+
+        // As we're loading the data asynchronously, we don't know what order it
+        // will arrive. So we keep a counter and create the chart when all the data is loaded.
+        seriesCounter += 1;
+
+        if (seriesCounter === global_symbols.length) {
+            createChart();
+        }
+    }
+
+    function get_data_in_current_month(data) {
+        var data_list = [];
+        var first_key = Object.keys(data)[0];
+        var first_value = data[first_key];
+        for (let key in data) {
+            data_list.push({
+                'x': parseInt(key),
+                'y': data[key] - first_value
+            });
+            first_value = data[key]
+        }
+        chart_data = {
+            "type": "column",
+            "name": "thang 7",
+            "dataGrouping": {
+                "approximation": "sum",
+                "enabled": true,
+                "forced": true,
+                "units": [
+                    ["week", [1]]
+                ]
+            },
+            "data": data_list,
+            // "pointStart": Date.UTC(2021, 7, 10),
+
+        }
+        createChart(chart_data);
+    }
+
+
+
+    function UrlExists(url) {
+        var http = new XMLHttpRequest();
+        http.open('HEAD', url, false);
+        http.send();
+        if (http.status != 404)
+            return true;
+        else
+            return false;
+    }
+</script>
