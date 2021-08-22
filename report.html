@@ -1,15 +1,14 @@
 <link rel="stylesheet" type="text/css" href="https://code.highcharts.com/css/annotations/popup.css">
 
 <!-- <script src="https://code.highcharts.com/highcharts.js"></script> -->
-<script src="https://code.highcharts.com/modules/boost.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<!-- <script src="https://code.highcharts.com/modules/boost.js"></script> -->
+<!-- <script src="https://code.highcharts.com/modules/exporting.js"></script> -->
 
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <!-- provide fullscreen option -->
 <!-- <script src="https://code.highcharts.com/stock/modules/exporting.js"></script> -->
 <!-- provide getJSON -->
 <script src="https://code.highcharts.com/modules/data.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- display label in line -->
 <!-- <script src="https://code.highcharts.com/modules/series-label.js"></script> -->
 <!-- <script src="https://code.highcharts.com/stock/indicators/indicators-all.js"></script> -->
@@ -23,30 +22,191 @@
     Chú ý: Số điện hàng tháng tính từ ngày 25 tháng trước tới hết ngày 24 tháng sau
 </p>
 
-<label for="start">Ngày bắt đầu:</label>
+<table>
+    <tr>
+        <td>
+            <label for="start">Ngày bắt đầu</label>
+        </td>
+        <td>
+            <input type="date" id="start_date" name="start_date">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="start">Ngày kết thúc</label>
+        </td>
+        <td>
+            <input type="date" id="end_date" name="end_date">
+        </td>
+    </tr>
 
-<input type="date" id="start_date" name="start_date">
+</table>
 
-<br>
-
-<label for="start">Ngày kết thúc:</label>
-
-<input type="date" id="end_date" name="end_date">
-
-<button>
+<button id="report">
 Xem báo cáo
 </button>
 
+<div class="form-group row col-md-8" style="border-bottom: solid 2px #7f99b3;">&nbsp;</div>
+<div class="form-group row col-md-12">
+    <div class="form-group row col-md-12">&nbsp;</div>
+    <div class="form-group row col-md-12">
+        <table style="width: 50%; border-collapse: collapse;" border="0">
+            <tbody>
+                <tr>
+                    <td style="width: 50%;">Chỉ số đầu</td>
+                    <td style="width: 50%;"><input type="number" /></td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">Chỉ số cuối</td>
+                    <td style="width: 50%;"><input type="number" /></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group row col-md-12"><label class="col-md-4 label mt-1" for="diennangtieuthu">Điện năng ti&ecirc;u thụ trong th&aacute;ng (KWh):</label> <input id="diennangtieuthu" class="form-control col-md-4 text-right" max="20000" min="0" name="diennangtieuthu" type="number" value="0"
+            data-previousvalue="50" aria-invalid="false" /></div>
+    <div class="form-group row col-md-12 mb-3">
+        <div class="col-md-4 label mt-1">&nbsp;</div>
+        <div class="col-md-4 text-right pr-0"><input id="btnTinhToan" class="btn btn-primary" type="submit" value="T&iacute;nh to&aacute;n" /></div>
+    </div>
+    <div class="form-group row col-md-8" style="border-bottom: solid 1px #e0e0e0;">&nbsp;</div>
+    <div class="form-group row col-md-12">
+        <table id="tblTinhTienDien" class="table col-md-8" style="word-wrap: break-word; width: 100%;">
+            <thead>
+                <tr>
+                    <th class="text-center" style="vertical-align: text-top; width: 20%; height: 28px;">&nbsp;</th>
+                    <th class="text-center" style="vertical-align: text-top; width: 20%; height: 28px;">Điện ti&ecirc;u thụ (kWh)</th>
+                    <th class="text-center" style="vertical-align: text-top; width: 5%; height: 28px;">&nbsp;</th>
+                    <th class="text-center" style="vertical-align: text-top; width: 20%; height: 28px;">Đơn gi&aacute; (đồng)</th>
+                    <th class="text-center" style="vertical-align: text-top; width: 5%; height: 28px;">&nbsp;</th>
+                    <th class="text-center" style="vertical-align: text-top; width: 30%; height: 28px;">Số tiền (đồng)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-left">Bậc thang 1</td>
+                    <td class="text-center">
+                        <p id="so_dien_bac_thang_1">50</p>
+                    </td>
+                    <td class="text-center">*</td>
+                    <td class="text-center">
+                        <p id="gia_dien_bac_thang_1">1.678</p>
+                    </td>
+                    <td class="text-center">=</td>
+                    <td class="text-right">
+                        <p id="tien_dien_bac_thang_1"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-left">Bậc thang 2</td>
+                    <td class="text-center">
+                        <p id="so_dien_bac_thang_2">50</p>
+                    </td>
+                    <td class="text-center">*</td>
+                    <td class="text-center">
+                        <p id="gia_dien_bac_thang_2">1.734</p>
+                    </td>
+                    <td class="text-center">=</td>
+                    <td class="text-right">
+                        <p id="tien_dien_bac_thang_2"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-left">Bậc thang 3</td>
+                    <td class="text-center">
+                        <p id="so_dien_bac_thang_3">100</p>
+                    </td>
+                    <td class="text-center">*</td>
+                    <td class="text-center">
+                        <p id="gia_dien_bac_thang_3">2.014</p>
+                    </td>
+                    <td class="text-center">=</td>
+                    <td class="text-right">
+                        <p id="tien_dien_bac_thang_3"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-left">Bậc thang 4</td>
+                    <td class="text-center">
+                        <p id="so_dien_bac_thang_4">100</p>
+                    </td>
+                    <td class="text-center">*</td>
+                    <td class="text-center">
+                        <p id="gia_dien_bac_thang_4">2.536</p>
+                    </td>
+                    <td class="text-center">=</td>
+                    <td class="text-right">
+                        <p id="tien_dien_bac_thang_4"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-left">Bậc thang 5</td>
+                    <td class="text-center">
+                        <p id="so_dien_bac_thang_5">100</p>
+                    </td>
+                    <td class="text-center">*</td>
+                    <td class="text-center">
+                        <p id="gia_dien_bac_thang_5">2.834</p>
+                    </td>
+                    <td class="text-center">=</td>
+                    <td class="text-right">
+                        <p id="tien_dien_bac_thang_5"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-left">Bậc thang 6</td>
+                    <td class="text-center">
+                        <p id="so_dien_bac_thang_6">0</p>
+                    </td>
+                    <td class="text-center">*</td>
+                    <td class="text-center">
+                        <p id="gia_dien_bac_thang_6">2.927</p>
+                    </td>
+                    <td class="text-center">=</td>
+                    <td class="text-right">
+                        <p id="tien_dien_bac_thang_6"></p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group row col-md-8" style="border-bottom: solid 1px #e0e0e0;">&nbsp;</div>
+    <div class="form-group row col-md-12">
+        <table id="tblTongTien" class="table col-md-8" style="word-wrap: break-word; width: 100%; font-weight: bold;">
+            <tbody>
+                <tr>
+                    <td class="text-left" style="width: 60%;">Tiền điện</td>
+                    <td id="tienDien" class="text-right" style="width: 40%;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="text-left" style="width: 60%;">Thuế GTGT (10%) tiền điện</td>
+                    <td id="tienThue" class="text-right" style="width: 40%;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="text-left" style="width: 60%;">Tổng tiền</td>
+                    <td id="tongTien" class="text-right" style="width: 40%;">&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-group row col-md-8" style="border-bottom: solid 2px #7f99b3;">&nbsp;</div>
 <br>
+<div class="form-wrapper">
+    Thống kê theo:
+    <button id="btn_hour_report" style="width: 70px;">Giờ</button>
+    <button id="btn_day_report" style="width: 70px;">Ngày</button>
+    <button id="btn_week_report" style="width: 70px;">Tuần</button>
+    <button id="btn_month_report" style="width: 70px;">Tháng</button>
+    <button id="btn_year_report" style="width: 70px;">Năm</button>
 
-<div id="hour_line_chart"></div>
+</div>
 
-<br>
-
-<div id="daily_column_chart"></div>
+<div id="my_chart"></div>
 
 <style>
-    #hour_line_chart {
+    #my_chart {
         width: 100%;
         height: 50%;
         margin: 1em auto;
@@ -54,22 +214,17 @@ Xem báo cáo
 </style>
 
 <script>
-    var seriesOptions = [],
-        seriesCounter = 0,
-        global_symbols = [],
-        selected_groups = ["base_indexes", "balance_funds"];
-
     var today = new Date();
     var start_day = 25;
-    var start_month = today.getMonth() == 0 ? 12 : today.getMonth();
-    var start_year = start_month == 12 ? today.getFullYear() - 1 : today.getFullYear();
+    var start_month = today.getMonth();
+    var start_year = start_month == 11 ? today.getFullYear() - 1 : today.getFullYear();
     var end_day = today.getDate();
-    var end_month = today.getMonth() + 1;
+    var end_month = today.getMonth();
     var end_year = today.getFullYear();
     var start_dd = String(start_day).padStart(2, '0');
     var start_mm = String(start_month).padStart(2, '0');
     var end_dd = String(end_day).padStart(2, '0');
-    var end_mm = String(end_month).padStart(2, '0');
+    var end_mm = String((end_month + 1)).padStart(2, '0');
 
     var start_time = start_year + "-" + start_mm + "-" + start_dd;
     var end_time = end_year + "-" + end_mm + "-" + end_dd;
@@ -82,45 +237,71 @@ Xem báo cáo
     document.getElementById('start_date').value = start_time;
     document.getElementById('end_date').value = end_time;
 
-    // create urls
-    var url_prefix = "https://raw.githubusercontent.com/hongsonitptit/power-consumption-data/main/data/";
-    var current_month_url = url_prefix + end_year + end_mm + ".json";
-    var previous_month_url = url_prefix + start_year + start_mm + ".json";
-    var current_year_url = url_prefix + end_year + ".json";
-    var previous_year_url = url_prefix + (end_year - 1) + ".json";
+    var start_index = 0;
+    var end_index = 0;
 
-    console.log(current_month_url + " : " + UrlExists(current_month_url));
-    console.log(previous_month_url + " : " + UrlExists(previous_month_url));
-    console.log(current_year_url + " : " + UrlExists(current_year_url));
-    console.log(previous_year_url + " : " + UrlExists(previous_year_url));
+    var data_url = "https://raw.githubusercontent.com/hongsonitptit/power-consumption-data/main/data/data.json";
+    var global_raw_data;
+    var global_chart_data;
+    var global_data_list;
 
-    var current_month_data;
-    var previous_month_data;
-    var current_year_data;
-    var previous_year_data;
-    var month_charts = 0;
-    var year_charts = 0;
-    month_charts += UrlExists(current_month_url) ? 1 : 0;
-    month_charts += UrlExists(previous_month_url) ? 1 : 0;
-    year_charts += UrlExists(current_year_url) ? 1 : 0;
-    year_charts += UrlExists(previous_year_url) ? 1 : 0;
+    var my_chart;
 
+    Highcharts.getJSON(data_url, get_data);
 
+    document.getElementById('report').addEventListener('click', () => {
+        my_chart.xAxis[0].setExtremes(
+            Date.UTC(2021, 6, 1),
+            Date.UTC(2021, 7, 31)
+        );
+    });
 
+    document.getElementById('btn_hour_report').addEventListener('click', () => {
+        global_chart_data.dataGrouping.units = [
+            ['hour', [6]]
+        ];
+        createChart(global_chart_data, "Tính theo giờ", "%H:%M %d/%m/%Y");
+    });
 
+    document.getElementById('btn_day_report').addEventListener('click', () => {
+        global_chart_data.dataGrouping.units = [
+            ['day', [1]]
+        ];
+        createChart(global_chart_data, "Tính theo ngày", "%d/%m/%Y");
+    });
 
-    Highcharts.getJSON(current_month_url, get_data_in_current_month);
+    document.getElementById('btn_week_report').addEventListener('click', () => {
+        global_chart_data.dataGrouping.units = [
+            ['week', [1]]
+        ];
+        createChart(global_chart_data, "Tính theo tuần", "%d/%m/%Y");
+    });
 
+    document.getElementById('btn_month_report').addEventListener('click', () => {
+        global_chart_data.dataGrouping.units = [
+            ['month', [1]]
+        ];
+        createChart(global_chart_data, "Tính theo tháng", "%m/%Y");
+    });
 
-
+    document.getElementById('btn_year_report').addEventListener('click', () => {
+        global_chart_data.dataGrouping.units = [
+            ['year', null]
+        ];
+        createChart(global_chart_data, "Tính theo năm", "%Y");
+    });
 
     /**
      * Create the chart when all data is loaded
      * @returns {undefined}
      */
-    function createChart(data) {
+    function createChart(
+        data,
+        subtitle,
+        tooltip_format,
+    ) {
 
-        Highcharts.stockChart('hour_line_chart', {
+        my_chart = Highcharts.stockChart('my_chart', {
             chart: {
                 type: 'column',
                 zoomType: 'x',
@@ -129,7 +310,7 @@ Xem báo cáo
             },
 
             legend: {
-                enabled: true
+                enabled: false
             },
 
             navigator: {
@@ -145,6 +326,8 @@ Xem báo cáo
             },
 
             rangeSelector: {
+                inputDateFormat: '%d/%m/%Y',
+                inputEditDateFormat: '%d/%m/%Y',
                 inputPosition: {
                     align: 'left',
                     x: 0,
@@ -159,82 +342,92 @@ Xem báo cáo
 
             xAxis: {
                 labels: {
-                    // format: "{value:%H:%M:%S %d/%m/%Y}"
-                    format: "{value:%H:%M}"
+                    format: "{value:%H:%M:%S %d/%m/%Y}"
+                        // format: "{value:%H:%M}"
                 },
                 type: "datetime",
             },
 
             title: {
-                text: 'Highcharts drawing ' + data.length + ' points'
+                text: 'Điện năng tiêu thụ'
             },
 
             subtitle: {
-                text: 'Using the Boost module'
+                text: subtitle
             },
 
             tooltip: {
                 formatter: function() {
-                    return Highcharts.dateFormat('%A, %b %e, %Y', this.x) +
+                    return '<b>' + Highcharts.dateFormat('%A ', this.x) + '</b>' +
+                        Highcharts.dateFormat(tooltip_format, this.x) +
                         ': <b>' + this.y.toFixed(2) + '</b>';
                 },
             },
 
             series: [data]
         });
+        // my_chart.xAxis[0].setExtremes(
+        //     Date.UTC(2021, 7, 1),
+        //     Date.UTC(2021, 7, 31)
+        // );
     }
 
-    function success(data) {
-        console.log(global_symbols);
-        let url = this.url;
-        let file_name = url.split('/').pop();
-        let type = url.split('/').pop();
-        let symbol = file_name.split('.')[0];
-        var i = global_symbols.indexOf(symbol);
-        seriesOptions[i] = {
-            name: symbol,
-            data: data
-        };
+    function calculate_index() {
+        var keys = Object.keys(global_raw_data);
+        var last_key = keys[keys.length - 1];
 
-        // As we're loading the data asynchronously, we don't know what order it
-        // will arrive. So we keep a counter and create the chart when all the data is loaded.
-        seriesCounter += 1;
+        // get end index
+        end_index = global_raw_data[last_key];
+        var start_unix_time = (new Date(start_year, start_month - 1, start_day, 0, 0, 0)).getTime();
 
-        if (seriesCounter === global_symbols.length) {
-            createChart();
+        // get start index
+        for (let key in global_raw_data) {
+            time = parseInt(key);
+            if (time > start_unix_time) {
+                start_index = global_raw_data[key];
+                break;
+            }
         }
+
+        console.log("start index = " + start_index);
+        console.log("end index = " + end_index);
     }
 
-    function get_data_in_current_month(data) {
+    function get_data(data) {
+        global_raw_data = data;
+
         var data_list = [];
-        var first_key = Object.keys(data)[0];
+        var keys = Object.keys(data);
+        var first_key = keys[0];
         var first_value = data[first_key];
         for (let key in data) {
+            time = parseInt(key);
             data_list.push({
-                'x': parseInt(key),
+                'x': time,
                 'y': data[key] - first_value
             });
-            first_value = data[key]
+            first_value = data[key];
         }
-        chart_data = {
+
+        calculate_index();
+
+        global_data_list = data_list;
+
+        global_chart_data = {
             "type": "column",
-            "name": "thang 7",
             "dataGrouping": {
                 "approximation": "sum",
                 "enabled": true,
                 "forced": true,
                 "units": [
-                    ["week", [1]]
+                    ["hour", [1]]
                 ]
             },
-            "data": data_list,
-            // "pointStart": Date.UTC(2021, 7, 10),
-
+            "data": data_list
         }
-        createChart(chart_data);
+
+        createChart(global_chart_data, "Tính theo giờ", "%H:%M %d/%m/%Y");
     }
-
-
 
     function UrlExists(url) {
         var http = new XMLHttpRequest();
